@@ -5,84 +5,42 @@
 
  <!-- html에 데이터를 넣는것 : 데이터 바인딩 -->
 <template>
-  <h1>사진 정보</h1>
+  <NavBar/><!-- 불러온 컴포넌트 사용 -->
+  <Event :text="text" /> <!-- props 사용 예시 / 속성명(props 변수) = "보낼 값"-->
+  
+  <!-- 파라미터에서 전달받은 값을 $event로 받을 수 있다  -->
+  <Photos 
+    :data="data" 
+    @openModal="isModal=true; selectedPhoto=$event"
+    @increaseLike="increaseLike($event)"
+  />
 
-  <!-- 뷰 문법 반복문으로 데이터 바인딩 -->
-  <!-- :key="i" : 인덱스 번호 지정하는거라 이해하자 -->
-  <div v-for="(photo, i) in data" :key="i" class="item">
-    <figure>
-      <img 
-        :src="`${photo.imgPath}`" 
-        :alt="`${photo.title}`" />
-    </figure>
-
-    <div class="info">
-      <h2 class="bg-yellow" :style="photo.textRed">
-        {{ photo.title }}
-      </h2>
-      <p>촬영일: {{ photo.year }}</p>
-      <p>장소: {{ photo.location }}</p> 
-
-      <!-- 좋아요 버튼 이벤트 -->
-      <!-- v-on:이벤트명="실행코드" 로 동작 -->
-      <!-- v-on 대신 @ 로 축약 가능 -->
-      <button @:click="increaseLike(i)">좋아요</button> 
-      <span>{{ photo.like }}</span>
-
-      <p>
-        <button @click="isModal=true">상세보기</button>
-      </p>
-    </div>
-  </div>
-
-  <div class="modal" v-if="isModal">
-    <div class="inner">
-      <h3>Detail</h3>
-      <p>사진 상세정보</p>
-      <button @click="isModal=false">닫기</button>
-    </div>
-  </div>
+  <!-- App에서는 하위 Modal 에서 온 closeModal 요청을 @로 받음-->
+  <!-- 이후 "" 안에 처리할 로직을 넣어서 처리 -->
+  <Modal 
+    :data="data" 
+    :isModal="isModal" 
+    :selectedPhoto="selectedPhoto" 
+    @closeModal="isModal=false"
+  />
 
 </template>
 
-
 <script>
+  import data from "./assets/photos"; // 사진 데이터 import
+  import NavBar from "./components/NavBar.vue"; // 컴포넌트 import
+  import Modal from "./components/Modal.vue"; // 컴포넌트 import
+  import Event from "./components/Event.vue";
+  import Photos from "./components/Photos.vue";
+
   export default {
     name: 'App',
     data(){
       return{
         isModal: false,
-        data: [
-          {
-            title: "등대",
-            year: 2024,
-            location: "정동진",
-            textRed: "color: red",
-            like: 0,
-            imgPath: "./assets/lighthouse.jpg",
-          },
-          {
-            title: "몽환적 경계",
-            year: 2024,
-            location: "여수", 
-            like: 0,
-            imgPath: "./assets/mystic.jpg",
-          },
-          {
-            title: "역군",
-            year: 2024,
-            location: "동해 어달항", 
-            like: 0,
-            imgPath: "./assets/power.jpg",
-          },
-          {
-            title: "고향가는길",
-            year: 2024,
-            location: "정동진", 
-            like: 0,
-            imgPath: "./assets/wayhome.jpg",
-          },
-        ]
+        data: data,
+        selectedPhoto: 0,
+        text: '광기와 우울의 시시한 연애?!',
       }
     },
     methods: {
@@ -91,6 +49,13 @@
         // this를 선언해줘야지만, 객체 내의 like를 찾는다.
         this.data[index].like += 1;
       }
+    },
+    // 컴포넌트 등록 
+    components: {
+      NavBar: NavBar,
+      Modal: Modal,
+      Event: Event,
+      Photos: Photos,
     }
   }
 </script>
