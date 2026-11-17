@@ -7,10 +7,19 @@
 <template>
   <NavBar/><!-- 불러온 컴포넌트 사용 -->
   <Event :text="text" /> <!-- props 사용 예시 / 속성명(props 변수) = "보낼 값"-->
-  
+
+  <SearchBar 
+    :data="data_temp" 
+    @searchPhoto="searchPhoto($event)"
+  />
+
+  <p>
+    <button @click="showAllPhoto">전체보기</button>
+  </p>
+
   <!-- 파라미터에서 전달받은 값을 $event로 받을 수 있다  -->
   <Photos 
-    :data="data" 
+    :data="data_temp" 
     @openModal="isModal=true; selectedPhoto=$event"
     @increaseLike="increaseLike($event)"
   />
@@ -32,22 +41,38 @@
   import Modal from "./components/Modal.vue"; // 컴포넌트 import
   import Event from "./components/Event.vue";
   import Photos from "./components/Photos.vue";
+  import SearchBar from "./components/SearchBar.vue";
 
   export default {
     name: 'App',
     data(){
       return{
         isModal: false,
-        data: data,
+        data: data, // 원본 데이터
+        data_temp: [...data], // 사본 데이터 // ...이 원래 있던 데이터를 복사해온다는 뜻
         selectedPhoto: 0,
         text: '광기와 우울의 시시한 연애?!',
       }
     },
     methods: {
       // 여기에 함수 추가 가능
-      increaseLike(index){
+      increaseLike(id){
         // this를 선언해줘야지만, 객체 내의 like를 찾는다.
-        this.data[index].like += 1;
+        // this.data[index].like += 1;
+        this.data.find(photo =>{
+          if(photo.id == id) {
+            photo.like += 1;
+          }
+        })
+      },
+      searchPhoto(title){
+        // 사진 제목이 포함된 데이터를 가져옴
+        this.data_temp = this.data.filter(photo =>{
+          return photo.title.includes(title);
+        })
+      },
+      showAllPhoto(){
+        this.data_temp = [...this.data];
       }
     },
     // 컴포넌트 등록 
@@ -56,6 +81,7 @@
       Modal: Modal,
       Event: Event,
       Photos: Photos,
+      SearchBar,
     }
   }
 </script>
