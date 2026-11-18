@@ -6,7 +6,7 @@
  <!-- html에 데이터를 넣는것 : 데이터 바인딩 -->
 <template>
   <NavBar/><!-- 불러온 컴포넌트 사용 -->
-  <Event :text="text" /> <!-- props 사용 예시 / 속성명(props 변수) = "보낼 값"-->
+  <Event :text="text[eventTextNum]" /> <!-- props 사용 예시 / 속성명(props 변수) = "보낼 값"-->
 
   <SearchBar 
     :data="data_temp" 
@@ -51,7 +51,13 @@
         data: data, // 원본 데이터
         data_temp: [...data], // 사본 데이터 // ...이 원래 있던 데이터를 복사해온다는 뜻
         selectedPhoto: 0,
-        text: '광기와 우울의 시시한 연애?!',
+        text: [
+          '광기와 우울의 시시한 연애?!',
+          '26년 최신 출사',
+          '연말기념 베스트 컷 모음'
+        ],
+        eventTextNum: 0,
+        interval: null,
       }
     },
     methods: {
@@ -82,6 +88,20 @@
       Event: Event,
       Photos: Photos,
       SearchBar,
+    },
+    // 라이프사이클 함수
+    mounted(){
+      console.log("mounted");
+      this.interval = setInterval(()=>{
+        if(this.eventTextNum == this.text.length - 1){
+          this.eventTextNum = 0;
+        }else{
+          this.eventTextNum += 1;
+        }
+      },3000)
+    },
+    unmounted(){
+      clearInterval(this.interval); // 인터벌 해제
     }
   }
 </script>
